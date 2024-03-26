@@ -60,7 +60,6 @@ class mainWindow(tk.Tk):
         self.player = "O" if self.player == "X" else "X"
         self.header.config(text='player %s\'s turn' % self.player)
         
-
     def check_winner(self):
         x = tuple(zip(self.gamestate[0], self.gamestate[1], self.gamestate[2]))
         #print(tuple(gamestate_cols))
@@ -73,15 +72,11 @@ class mainWindow(tk.Tk):
         if self.gamestate[2][0].cget('text') != '' and all(cell.cget('text') == self.gamestate[2][0].cget('text') for cell in self.gamestate[2]):
             return True
         
-        # check vertical
-        
-
+        # Check vertical
         if self.gamestate[0][0].cget('text') != '' and all(cell.cget('text') == self.gamestate[0][0].cget('text') for cell in x[0]):
             return True
-        
         if self.gamestate[0][1].cget('text') != '' and all(cell.cget('text') == self.gamestate[0][1].cget('text') for cell in x[1]):
             return True
-        
         if self.gamestate[0][2].cget('text') != '' and all(cell.cget('text') == self.gamestate[0][2].cget('text') for cell in x[2]):
             return True
 
