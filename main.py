@@ -45,7 +45,7 @@ class mainWindow(tk.Tk):
             for j in range(9):
                 button = tk.Button(self.buttonframe, text='', font=("Arial", 24), height=1, width=3, pady=5, padx=5, command=lambda row=i, col=j: self.button_clicked(row, col))
                 self.gamestate[i][j] = button
-                button.grid(row=i, column=j)
+                button.grid(row=i, column=j, sticky='NSEW')
         
         self.default_button_colour = self.gamestate[0][0].cget('background')
         
@@ -71,6 +71,7 @@ class mainWindow(tk.Tk):
         # Indicates/Sets playable board
         self.disable_game_buttons()
         self.set_playable_board(row, col)
+        self.disable_played_buttons()
 
         # Changes player turn
         self.player = "O" if self.player == "X" else "X"
@@ -167,7 +168,7 @@ class mainWindow(tk.Tk):
         for i in range(3):
                 for j in range(3):
                     self.gamestate[3*top_corner_row+i][3*top_corner_col+j].config(state='disabled', bg='light grey')
-    
+
     # Whole game functions.
     def disable_game_buttons(self):
         for i in range(9):
@@ -178,6 +179,13 @@ class mainWindow(tk.Tk):
         for i in range(9):
             for j in range(9):
                 self.gamestate[i][j].config(state='active', bg=self.default_button_colour)
+
+    # Disables buttons which have already been played.
+    def disable_played_buttons(self):
+        for i in range(9):
+            for j in range(9):
+                if self.gamestate[i][j].cget('text') != '':
+                    self.gamestate[i][j].config(state='disabled')
 
     def restart(self):
         for i in range(9):
