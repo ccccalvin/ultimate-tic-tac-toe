@@ -17,6 +17,7 @@ class mainWindow(tk.Tk):
 
         # Constants
         self.turn_indicator_image = tk.PhotoImage(file='ultimate_ttt\yellow_circle.png')
+        self.default_button_colour = None   # set within self.add_layout 
 
         # Variables
         self.player = 'X'
@@ -60,15 +61,19 @@ class mainWindow(tk.Tk):
 
         # If a board has won,
         if result:
-            self.boards_won.append([board_row,board_column])
-            self.indicate_board_win(board_row,board_column)
-            self.disable_board(board_row,board_column)
+            self.boards_won.append([board_row, board_column])
+            self.indicate_board_win(board_row, board_column)
+            self.disable_board(board_row, board_column)
             
             messagebox.showinfo(title='title', message='player %s won in board %d %d' % (self.player, board_row, board_column))
 
         # Updates player turn label
         self.player = "O" if self.player == "X" else "X"
         self.header.config(text='player %s\'s turn' % self.player)
+
+        # Indicates/sets playable board
+        self.disable_game_buttons()
+        self.set_playable_board(row, col)
 
         # print('clicked')
 
@@ -103,7 +108,31 @@ class mainWindow(tk.Tk):
                 if self.gamestate[3*row][3*col+2].cget('text') != '' and self.gamestate[3*row][3*col+2].cget('text') == self.gamestate[3*row+1][3*col+1].cget('text') == self.gamestate[3*row+2][3*col].cget('text'):
                     return True, row, col
         
-        return False, None, None
+        return False, row, col
+
+    def set_playable_board(self, row, col):
+        # Finds top corner row of playable board
+        if row % 3 == 0:
+            board_top_corner_row = 0
+        if row % 3 == 1:
+            board_top_corner_row = 1
+        if row % 3 == 2:
+            board_top_corner_row = 2
+        
+        # Finds top corner column of playable board
+        if col % 3 == 0:
+            board_top_corner_col = 0
+        if col % 3 == 1:
+            board_top_corner_col = 1
+        if col % 3 == 2:
+            board_top_corner_col = 2
+        
+        self.enable_board(board_top_corner_row, board_top_corner_col)
+
+    def enable_board(self, top_corner_row, top_corner_col):
+        for i in range(3):
+                for j in range(3):
+                    self.gamestate[3*top_corner_row+i][3*top_corner_col+j].config(state='active', bg=self.default_button_colour)
 
     def indicate_board_win(self, top_corner_row, top_corner_col):
         if self.player == "X":
@@ -122,6 +151,11 @@ class mainWindow(tk.Tk):
         for i in range(3):
                 for j in range(3):
                     self.gamestate[3*top_corner_row+i][3*top_corner_col+j].config(state='disabled')
+    
+    def disable_game_buttons(self):
+        for i in range(9):
+            for j in range(9):
+                self.gamestate[i][j].config(state='disabled', bg='light grey')
 
     def restart(self):
         for i in range(9):
@@ -132,9 +166,6 @@ class mainWindow(tk.Tk):
         self.boards_won = []
 
 
-        
-
-        
 if __name__=="__main__":
     app = mainWindow()
     app.mainloop()
