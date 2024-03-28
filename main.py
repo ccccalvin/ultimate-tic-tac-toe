@@ -1,7 +1,6 @@
 import tkinter as tk
 import numpy as np
 from tkinter import messagebox
-from frame import Game
 import os
 
 os.system('cls')
@@ -34,18 +33,23 @@ class mainWindow(tk.Tk):
         self.header.grid(row=0, column=0)
 
         # creates frame for buttons
-        self.buttonframe = tk.Frame(self, padx=10, pady=10)
-        # self.buttonframe.columnconfigure(0, weight=3)
-        # self.buttonframe.columnconfigure(1, weight=1)
-        # self.buttonframe.columnconfigure(2, weight=1)
-        self.buttonframe.grid(row=1, column=0, sticky='E')
+        self.buttonframe = tk.Frame(self, background='black')
+        self.buttonframe.grid(row=1, column=0)
 
         # creates game buttons
         for i in range(9):
             for j in range(9):
-                button = tk.Button(self.buttonframe, text='', font=("Arial", 24), height=1, width=3, pady=5, padx=5, command=lambda row=i, col=j: self.button_clicked(row, col))
+                button = tk.Button(self.buttonframe, text='', font=("Arial", 24), height=1, width=3, command=lambda row=i, col=j: self.button_clicked(row, col))
                 self.gamestate[i][j] = button
-                button.grid(row=i, column=j, sticky='NSEW')
+
+                if (j % 10 == 2 or j % 10 == 5) and (i % 10 == 2 or i % 10 == 5):
+                    button.grid(row=i, column=j, padx=(0,10), pady=(0,10))
+                elif j % 10 == 2 or j % 10 == 5:
+                    button.grid(row=i, column=j, padx=(0,10))
+                elif i % 10 == 2 or i % 10 == 5:
+                    button.grid(row=i, column=j, pady=(0,10))
+                else:
+                    button.grid(row=i, column=j)
         
         self.default_button_colour = self.gamestate[0][0].cget('background')
         
@@ -167,13 +171,13 @@ class mainWindow(tk.Tk):
     def disable_board(self, top_corner_row, top_corner_col):
         for i in range(3):
                 for j in range(3):
-                    self.gamestate[3*top_corner_row+i][3*top_corner_col+j].config(state='disabled', bg='light grey')
+                    self.gamestate[3*top_corner_row+i][3*top_corner_col+j].config(state='disabled', bg='#bfbfbf')
 
     # Whole game functions.
     def disable_game_buttons(self):
         for i in range(9):
             for j in range(9):
-                self.gamestate[i][j].config(state='disabled', bg='light grey')
+                self.gamestate[i][j].config(state='disabled', bg='#bfbfbf')
 
     def enable_game_buttons(self):
         for i in range(9):
@@ -196,6 +200,7 @@ class mainWindow(tk.Tk):
         self.boards_won = {}
 
 
+# Starts the mainWindow loop.
 if __name__=="__main__":
     app = mainWindow()
     app.mainloop()
