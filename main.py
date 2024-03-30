@@ -17,6 +17,7 @@ class mainWindow(tk.Tk):
         # Constants
         self.turn_indicator_image = tk.PhotoImage(file='ultimate_ttt\yellow_circle.png')
         self.default_button_colour = None   # set within self.add_layout 
+        self.win_message = 'player %s wins the game'
 
         # Variables
         self.player = 'X'
@@ -42,6 +43,7 @@ class mainWindow(tk.Tk):
                 button = tk.Button(self.buttonframe, text='', font=("Arial", 24), height=1, width=3, command=lambda row=i, col=j: self.button_clicked(row, col))
                 self.gamestate[i][j] = button
 
+                # Makes the lines between the individual boards. 
                 if (j % 10 == 2 or j % 10 == 5) and (i % 10 == 2 or i % 10 == 5):
                     button.grid(row=i, column=j, padx=(0,10), pady=(0,10))
                 elif j % 10 == 2 or j % 10 == 5:
@@ -54,7 +56,7 @@ class mainWindow(tk.Tk):
         self.default_button_colour = self.gamestate[0][0].cget('background')
         
         # creates reset button
-        self.reset = tk.Button(self, text='Reset', font=('Arial', 18), command=self.restart)
+        self.reset = tk.Button(self, fg='red', text='Reset', font=('Arial', 18), command=self.restart)
         self.reset.grid(row=2, column=0)
     
     # When a game button is clicked...
@@ -64,13 +66,24 @@ class mainWindow(tk.Tk):
         
         # Checking if a board has won everytime a button is clicked
         result, board_row, board_column = self.check_winner_board()
-
+        
         # If a board has won,
         if result:
             self.boards_won[(board_row, board_column)] = self.player
             self.indicate_board_win(board_row, board_column, self.player)
+            print(self.boards_won)
+            print((board_row, board_column))
+            print((board_row, board_column) in self.boards_won)
             
-            messagebox.showinfo(title='title', message='player %s won in board %d %d' % (self.player, board_row, board_column))
+            # messagebox.showinfo(title='title', message='player %s won in board %d %d' % (self.player, board_row, board_column))
+
+        game_result, winner = self.check_winner_game()
+
+        # If someone won the game,
+        if game_result:
+            messagebox.showinfo(title='WINNER', message=self.win_message % (winner))
+            self.disable_game_buttons()
+            return
 
         # Indicates/Sets playable board
         self.disable_game_buttons()
@@ -79,7 +92,7 @@ class mainWindow(tk.Tk):
 
         # Changes player turn
         self.player = "O" if self.player == "X" else "X"
-        self.header.config(text='player %s\'s turn' % self.player)
+        self.header.config(text='player %s\'s turn' % self.player)            
 
     # Checks if any board has won. Returns bool: result, int: row, int: col .
     def check_winner_board(self):
@@ -114,6 +127,32 @@ class mainWindow(tk.Tk):
                     return True, row, col
         
         return False, row, col
+
+    # Checks if anyone has won the game.
+    def check_winner_game(self):
+        # Check horizontals
+        if ((0,0) in self.boards_won) and ((0,1) in self.boards_won) and ((0,2) in self.boards_won) and (self.boards_won[(0,0)] == self.boards_won[(0,1)] == self.boards_won[(0,2)]):
+            return True, self.boards_won[(0,0)]
+        if (1,0) in self.boards_won and (1,1) in self.boards_won and (1,2) in self.boards_won and self.boards_won[(1,0)] == self.boards_won[(1,1)] == self.boards_won[(1,2)]:
+            return True, self.boards_won[(1,0)]
+        if (2,0) in self.boards_won and (2,1) in self.boards_won and (2,2) in self.boards_won and self.boards_won[(2,0)] == self.boards_won[(2,1)] == self.boards_won[(2,2)]:
+            return True, self.boards_won[(2,0)]
+        
+        # Check verticals
+        if ((0,0) in self.boards_won) and ((1,0) in self.boards_won) and ((2,0) in self.boards_won) and (self.boards_won[(0,0)] == self.boards_won[(1,0)] == self.boards_won[(2,0)]):
+            return True, self.boards_won[(0,0)]
+        if ((0,1) in self.boards_won) and ((1,1) in self.boards_won) and ((2,1) in self.boards_won) and (self.boards_won[(0,1)] == self.boards_won[(1,1)] == self.boards_won[(2,1)]):
+            return True, self.boards_won[(0,0)]
+        if ((0,2) in self.boards_won) and ((1,2) in self.boards_won) and ((2,2) in self.boards_won) and (self.boards_won[(0,2)] == self.boards_won[(1,2)] == self.boards_won[(2,2)]):
+            return True, self.boards_won[(0,0)]
+        
+        # Check diagonals
+        if ((0,0) in self.boards_won) and ((1,1) in self.boards_won) and ((2,2) in self.boards_won) and (self.boards_won[(0,0)] == self.boards_won[(1,1)] == self.boards_won[(2,2)]):
+            return True, self.boards_won[(0,0)]
+        if ((2,0) in self.boards_won) and ((1,1) in self.boards_won) and ((0,2) in self.boards_won) and (self.boards_won[(2,0)] == self.boards_won[(1,1)] == self.boards_won[(0,2)]):
+            return True, self.boards_won[(0,0)]
+        
+        return False, None
 
     # Enables the buttons of the playable board.
     def set_playable_board(self, row, col):
@@ -196,7 +235,7 @@ class mainWindow(tk.Tk):
             for j in range(9):
                 self.gamestate[i][j].config(text='', state='active', bg=self.default_button_colour)
 
-        # Reset the indictor for which boards have won
+        # Reset the inself.boards_wonor for which boards have won
         self.boards_won = {}
 
 
