@@ -1,4 +1,4 @@
-# Ultimate Tic-Tac-Toe
+# Ultimate Tic-Tac-Toe (unfinished)
 
 An ultimate way to play Tic Tac Toe.
 
